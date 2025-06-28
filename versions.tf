@@ -1,3 +1,4 @@
+# versions.tf
 terraform {
   required_version = ">= 1.0"
   required_providers {
@@ -11,11 +12,11 @@ terraform {
     }
   }
 
-  # Backend S3 pour stocker l'état Terraform
   backend "s3" {
     bucket = "apapp-alert-terraform-state"
     key    = "prod/terraform.tfstate"
     region = "eu-west-1"
+    # PAS de ligne dynamodb_table !
   }
 }
 
