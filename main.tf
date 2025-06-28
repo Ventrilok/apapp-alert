@@ -49,7 +49,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "sns:Publish"
         ]
         Resource = [
-          aws_sns_topic.turtle_alerts.arn,
+          aws_sns_topic.apapp_alerts.arn,
           "*" # Pour les SMS directs
         ]
       }
