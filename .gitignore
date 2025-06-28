@@ -1,0 +1,59 @@
+# .gitignore
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+*.tfplan
+
+# Terraform variable files
+terraform.tfvars
+*.tfvars
+*.auto.tfvars
+terraform.tfvars.json
+*.auto.tfvars.json
+
+# Secrets and keys
+*.pem
+*.key
+.env
+.env.local
+
+# Lambda deployment packages
+lambda/*.zip
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# AWS SAM/Serverless Framework
+.aws-sam/
+.serverless/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE files
+.vscode/
+*~
+
+# Logs
+*.log
