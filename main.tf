@@ -194,7 +194,7 @@ resource "aws_api_gateway_deployment" "apapp_deployment" {
 resource "aws_api_gateway_stage" "apapp_stage" {
   deployment_id = aws_api_gateway_deployment.apapp_deployment.id
   rest_api_id   = aws_api_gateway_rest_api.apapp_api.id
-  stage_name    = "alert"
+  stage_name    = ""
 
   tags = {
     Project     = var.project_name
