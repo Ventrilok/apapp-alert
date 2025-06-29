@@ -29,60 +29,19 @@ def lambda_handler(event, context):
         ip_address = event['requestContext']['identity']['sourceIp']
         user_agent = event['requestContext']['identity'].get('userAgent', 'Unknown')
         
-        # Geolocation (if provided by browser)
-        lat = query_params.get('lat', 'Not available')
-        lng = query_params.get('lng', 'Not available')
-        
+        # Remove geolocation: lat/lng not used
         # Generate unique ID for this alert
         alert_id = str(uuid.uuid4())
         
         # Build alert message
-        location_text = f"📍 Lat: {lat}, Lng: {lng}" if lat != 'Not available' else "📍 Location not available"
+        location_text = "📍 Location not provided"
         
         # SMS message (short)
-        sms_message = f"""🚨 TORTOISE IN DISTRESS
-⏰ {timestamp_str}
-{location_text}
-🆔 {alert_id[:8]}"""
+        sms_message = f"""🚨 TORTOISE IN DISTRESS\n⏰ {timestamp_str}\n{location_text}\n🆔 {alert_id[:8]}"""
         
         # Email message (detailed)
-        email_message = f"""🚨 TORTOISE DISTRESS ALERT 🚨
+        email_message = f"""🚨 TORTOISE DISTRESS ALERT 🚨\n\n📋 ALERT DETAILS:\n⏰ Time: {timestamp_str}\n🌍 IP Address: {ip_address}\n📱 Device: {user_agent}\n🆔 Alert ID: {alert_id}\n\n⚡ Action required: Check the area quickly!\n\n---\n{project_name} automated alert system"""
 
-📋 ALERT DETAILS:
-⏰ Time: {timestamp_str}
-📍 Location: 
-   - Latitude: {lat}
-   - Longitude: {lng}
-🌍 IP Address: {ip_address}
-📱 Device: {user_agent}
-🆔 Alert ID: {alert_id}
-
-🔗 If geolocation available:
-   Google Maps: https://maps.google.com/?q={lat},{lng}
-
-⚡ Action required: Check the area quickly!
-
----
-{project_name} automated alert system"""
-
-        # Log to DynamoDB
-        try:
-            table = dynamodb.Table(f'{project_name}-logs')
-            table.put_item(
-                Item={
-                    'alert_id': alert_id,
-                    'timestamp': timestamp.isoformat(),
-                    'ip_address': ip_address,
-                    'latitude': lat,
-                    'longitude': lng,
-                    'user_agent': user_agent,
-                    'processed': True
-                }
-            )
-        except Exception as log_error:
-            print(f"DynamoDB logging error: {log_error}")
-            # Continue even if logging fails
-        
         # Send SMS
         try:
             sns.publish(
@@ -110,127 +69,94 @@ def lambda_handler(event, context):
         except Exception as email_error:
             print(f"Email error: {email_error}")
         
-        # HTML confirmation page
+        # HTML confirmation page (no geolocation)
         html_response = f"""
         <!DOCTYPE html>
-        <html lang="en">
+        <html lang=\"fr\">
         <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Alert Sent!</title>
+            <meta charset=\"UTF-8\">
+            <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+            <title>Alerte envoyée !</title>
             <style>
-                * {{
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }}
-                
-                body {{
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    min-height: 100vh;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: white;
-                    padding: 20px;
-                }}
-                
-                .container {{
-                    background: rgba(255,255,255,0.15);
-                    backdrop-filter: blur(10px);
-                    border-radius: 20px;
-                    padding: 40px;
-                    max-width: 400px;
-                    width: 100%;
-                    text-align: center;
-                    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
-                    border: 1px solid rgba(255,255,255,0.2);
-                }}
-                
-                .emoji {{
-                    font-size: 60px;
-                    margin-bottom: 20px;
-                    display: block;
-                }}
-                
-                h1 {{
-                    margin: 20px 0;
-                    font-size: 28px;
-                    font-weight: 600;
-                }}
-                
-                p {{
-                    font-size: 16px;
-                    line-height: 1.6;
-                    margin-bottom: 15px;
-                    opacity: 0.9;
-                }}
-                
-                .alert-id {{
-                    font-family: 'Courier New', monospace;
-                    background: rgba(255,255,255,0.2);
-                    padding: 8px 12px;
-                    border-radius: 8px;
-                    font-size: 14px;
-                    margin: 20px 0;
-                }}
-                
-                .time {{
-                    font-size: 14px;
-                    opacity: 0.7;
-                    margin-top: 30px;
-                }}
-                
-                .location {{
-                    font-size: 12px;
-                    opacity: 0.6;
-                    margin-top: 10px;
-                }}
-                
-                @media (max-width: 480px) {{
-                    .container {{ padding: 30px 20px; }}
-                    h1 {{ font-size: 24px; }}
-                    .emoji {{ font-size: 50px; }}
-                }}
+            * {{
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }}
+            body {{
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                padding: 20px;
+            }}
+            .container {{
+                background: rgba(255,255,255,0.15);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 40px;
+                max-width: 400px;
+                width: 100%;
+                text-align: center;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+                border: 1px solid rgba(255,255,255,0.2);
+            }}
+            .emoji {{
+                font-size: 60px;
+                margin-bottom: 20px;
+                display: block;
+            }}
+            h1 {{
+                margin: 20px 0;
+                font-size: 28px;
+                font-weight: 600;
+            }}
+            p {{
+                font-size: 16px;
+                line-height: 1.6;
+                margin-bottom: 15px;
+                opacity: 0.9;
+            }}
+            .alert-id {{
+                font-family: 'Courier New', monospace;
+                background: rgba(255,255,255,0.2);
+                padding: 8px 12px;
+                border-radius: 8px;
+                font-size: 14px;
+                margin: 20px 0;
+            }}
+            .time {{
+                font-size: 14px;
+                opacity: 0.7;
+                margin-top: 30px;
+            }}
+            .location {{
+                font-size: 12px;
+                opacity: 0.6;
+                margin-top: 10px;
+            }}
+            @media (max-width: 480px) {{
+                .container {{ padding: 30px 20px; }}
+                h1 {{ font-size: 24px; }}
+                .emoji {{ font-size: 50px; }}
+            }}
             </style>
         </head>
         <body>
             <div class="container">
-                <span class="emoji">🐢✅</span>
-                <h1>Alert Sent!</h1>
-                <p>Thank you for reporting a tortoise in distress.</p>
-                <p>The alert has been sent instantly via SMS and email.</p>
-                
-                <div class="alert-id">
-                    ID: {alert_id[:8]}
-                </div>
-                
-                <div class="time">Sent on {timestamp_str}</div>
-                <div class="location">{location_text}</div>
+            <span class="emoji">🐢✅</span>
+            <h1>Alerte envoyée</h1>
+            <p>Merci d’avoir signalé une tortue en détresse.</p>
+            <p>Votre alerte a bien été envoyée.</p>
+            <div class="alert-id">
+                ID : {alert_id[:8]}
             </div>
-            
-            <script>
-                // Attempt geolocation to improve accuracy
-                if ("geolocation" in navigator && "{lat}" === "Not available") {{
-                    navigator.geolocation.getCurrentPosition(
-                        function(position) {{
-                            // Send coordinates back for more precise alert
-                            fetch(window.location.href + 
-                                  `?lat=${{position.coords.latitude}}&lng=${{position.coords.longitude}}&accuracy=${{position.coords.accuracy}}`
-                            ).catch(err => console.log('Geolocation update failed:', err));
-                        }},
-                        function(error) {{
-                            console.log('Geolocation denied or failed:', error);
-                        }},
-                        {{
-                            enableHighAccuracy: true,
-                            timeout: 10000,
-                            maximumAge: 300000
-                        }}
-                    );
-                }}
-            </script>
+            <div class="time">Envoyée le {timestamp_str}</div>
+            <div class="location">{location_text}</div>
+            </div>
         </body>
         </html>
         """
