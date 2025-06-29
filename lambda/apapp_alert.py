@@ -12,7 +12,6 @@ def lambda_handler(event, context):
     """
     # AWS clients
     sns = boto3.client('sns')
-    dynamodb = boto3.resource('dynamodb')
     
     # Environment variables
     topic_arn = os.environ['SNS_TOPIC_ARN']
@@ -29,7 +28,6 @@ def lambda_handler(event, context):
         ip_address = event['requestContext']['identity']['sourceIp']
         user_agent = event['requestContext']['identity'].get('userAgent', 'Unknown')
         
-        # Remove geolocation: lat/lng not used
         # Generate unique ID for this alert
         alert_id = str(uuid.uuid4())
         
