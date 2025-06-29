@@ -11,7 +11,7 @@ def lambda_handler(event, context):
     Lambda function to handle tortoise distress alerts
     """
     # AWS clients
-    sns = boto3.client('sns', region_name='us-east-1')
+    sns = boto3.client('sns')
     
     # Environment variables
     topic_arn = os.environ['SNS_TOPIC_ARN']
