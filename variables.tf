@@ -4,12 +4,6 @@ variable "aws_region" {
   default     = "eu-west-1"
 }
 
-variable "phone_number" {
-  description = "Phone number for SMS alerts"
-  type        = string
-  sensitive   = true
-}
-
 variable "email_address" {
   description = "Email address for alerts"
   type        = string

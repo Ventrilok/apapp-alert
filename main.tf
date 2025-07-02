@@ -3,7 +3,7 @@
 # S3 bucket for storing Terraform state (create manually first)
 # aws s3 mb s3://apapp-alert-terraform-state
 
-# IAM Role pour Lambda
+# IAM Role for Lambda
 resource "aws_iam_role" "lambda_role" {
   name = "${var.project_name}-lambda-role"
 
@@ -26,7 +26,7 @@ resource "aws_iam_role" "lambda_role" {
   }
 }
 
-# Policy pour permettre à Lambda d'utiliser SNS et CloudWatch
+# Policy to allow Lambda to use SNS (email only) and CloudWatch
 resource "aws_iam_role_policy" "lambda_policy" {
   name = "${var.project_name}-lambda-policy"
   role = aws_iam_role.lambda_role.id
@@ -48,10 +48,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Action = [
           "sns:Publish"
         ]
-        Resource = [
-          aws_sns_topic.apapp_alerts.arn,
-          "*" # Pour les SMS directs
-        ]
+        Resource = aws_sns_topic.apapp_alerts.arn
       }
     ]
   })
@@ -96,7 +93,6 @@ resource "aws_lambda_function" "apapp_alert" {
   environment {
     variables = {
       SNS_TOPIC_ARN = aws_sns_topic.apapp_alerts.arn
-      PHONE_NUMBER  = var.phone_number
       PROJECT_NAME  = var.project_name
     }
   }
