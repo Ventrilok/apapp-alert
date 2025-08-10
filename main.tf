@@ -84,7 +84,7 @@ resource "aws_lambda_function" "apapp_alert" {
   function_name = "${var.project_name}-handler"
   role          = aws_iam_role.lambda_role.arn
   handler       = "apapp_alert.lambda_handler"
-  runtime       = "python3.9"
+  runtime       = "python3.12"
   timeout       = 30
   memory_size   = 128
 
